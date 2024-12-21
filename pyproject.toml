@@ -7,7 +7,9 @@ authors = [
     { name = "hongyu", email = "hongyu@aestheticintegration.com" }
 ]
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [
+    "langgraph>=0.2.60",
+]
 
 [build-system]
 requires = ["hatchling"]
