@@ -20,19 +20,40 @@ def get_chat_model() -> BaseChatModel:
 
 
 class LoadingAnimation:
-    def __init__(self):
+    def __init__(
+        self,
+        tally_choice: int = 0,
+        append_tally: bool = False,
+    ):
         self.is_running = False
-        self.frames = ["-", "\\", "|", "/"]
         self.output = widgets.Output()
+        self.frames = self.tallies[tally_choice][0]
+        self.tally = self.tallies[tally_choice][1]
+        self.append_tally = append_tally
+
+    @property
+    def tallies(self) -> list[tuple[list[str], str]]:
+        return [
+            (["-", "\\", "|", "/"], "x"),
+            (["一", "丄", "上", "止", "正"], "正"),
+        ]
+
+    def get_frame(self, frame_idx: int) -> str:
+        d, r = divmod(frame_idx, len(self.frames))
+        if not self.append_tally:
+            frame = self.frames[r]
+        else:
+            frame = f"{self.tally * d}{self.frames[r]}"
+        return frame
 
     def animate(self):
         frame_idx = 0
         while self.is_running:
             with self.output:
-                self.output.clear_output(wait=True)  # Important: use wait=True
-                display(HTML(f"<b>Thinking {self.frames[frame_idx]}</b>"))
-            frame_idx = (frame_idx + 1) % len(self.frames)
-            time.sleep(0.1)
+                self.output.clear_output(wait=True)
+                display(HTML(f"Thinking: {self.get_frame(frame_idx)}"))
+            frame_idx += 1
+            time.sleep(1 / len(self.frames))
 
     def start(self):
         self.is_running = True
@@ -44,6 +65,9 @@ class LoadingAnimation:
         self.thread.join()
         self.output.clear_output()
 
+    def display(self):
+        return self.output
+
 
 class ChatInterface:
     def __init__(self):
@@ -52,8 +76,11 @@ class ChatInterface:
         self.input.continuous_update = False
         self.input.observe(self.handler, names="value")
         self.output = widgets.Output(layout=widgets.Layout(border="1px solid black"))
-        self.loading_bar = LoadingAnimation()
+        self.loading_bar = LoadingAnimation(0, False)
         self.chat_model = get_chat_model()
+
+    def format_message(self, role: str, content: str) -> str:
+        return f'<div style="font-size: 1.2em"><b>{role}:</b> {content}</div>'
 
     def handler(self, change: dict):
         if change["new"].strip() == "":
@@ -62,7 +89,7 @@ class ChatInterface:
         self.input.value = ""
 
         with self.output:
-            display(HTML(f"<b>You:</b> {q_msg.content}"))
+            display(HTML(self.format_message("You", q_msg.content)))
 
         try:
             self.loading_bar.start()
@@ -70,12 +97,12 @@ class ChatInterface:
             self.chat_history.extend([q_msg, a_msg])
             self.loading_bar.stop()
             with self.output:
-                display(HTML(f"<b>Assistant:</b> {a_msg.content}"))
+                display(HTML(self.format_message("Assistant", a_msg.content)))
 
         except Exception as e:
             self.loading_bar.stop()
             with self.output:
-                display(HTML(f"<b>Error:</b> {str(e)}"))
+                display(HTML(self.format_message("Error", str(e))))
 
     def display(self):
         return widgets.VBox(
