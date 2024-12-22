@@ -7,7 +7,7 @@ import ipywidgets as widgets
 from IPython.display import HTML, display
 from langchain_anthropic import ChatAnthropic
 from langchain_core.language_models import BaseChatModel
-from langchain_core.messages import BaseMessage, HumanMessage
+from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
 
 
 @lru_cache(maxsize=1)
@@ -79,6 +79,9 @@ class ChatInterface:
         self.loading_bar = LoadingAnimation(0, False)
         self.chat_model = get_chat_model()
 
+    def chat(self, messages: list[BaseMessage]) -> AIMessage:
+        return self.chat_model.invoke(messages)
+
     def format_message(self, role: str, content: str) -> str:
         return f'<div style="font-size: 1.2em"><b>{role}:</b> {content}</div>'
 
@@ -93,7 +96,7 @@ class ChatInterface:
 
         try:
             self.loading_bar.start()
-            a_msg = self.chat_model.invoke(self.chat_history + [q_msg])
+            a_msg = self.chat(self.chat_history + [q_msg])
             self.chat_history.extend([q_msg, a_msg])
             self.loading_bar.stop()
             with self.output:
