@@ -6,6 +6,9 @@ Chat with DataFrame inside Jupyter notebooks
 - Create truly scientific visualizations using `altair`, `plotly`, and `matplotlib`
 - Automatically perform Exploratory Data Analysis (EDA)
 
+### Features
+- drop-in replacement for `df.info()`, `df.describe()`
+
 ### Pipeline
 DataFrame <-> Formal Representation of Visualization (FRV) <-> Visualization Code (`altair`, `plotly`, `matplotlib`) <-> Plot
 
