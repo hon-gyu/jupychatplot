@@ -20,6 +20,7 @@ dependencies = [
     "python-dotenv>=1.0.1",
     "rich>=13.9.4",
     "gradio>=5.19.0",
+    "polars>=1.23.0",
 ]
 
 [build-system]
@@ -28,3 +29,8 @@ build-backend = "hatchling.build"
 
 [tool.pytest.ini_options]
 addopts = "--doctest-modules"
+
+[dependency-groups]
+dev = [
+    "kagglehub>=0.3.10",
+]

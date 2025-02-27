@@ -26,3 +26,11 @@ With each chat interaction, the FRV is dynamically updated, increasingly incorpo
   - list[tuple[str, str]]: [(facts / insights, viz_code)]
 - critical questions
 - suggested explorations
+- essential data cleaning
+
+---
+
+- type of data? time-series, cross-sectional, etc.
+- recommend transformations
+- stored transformation?
+- autogluon
